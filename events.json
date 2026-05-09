@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "title": "Bakti Sosial Panti Asuhan",
+    "location": "Jakarta Selatan",
+    "date": "2026-04-20",
+    "time": "09:00 - 15:00",
+    "organizer": "Komunitas Peduli Sesama",
+    "contact": "0812-3456-7890",
+    "image": "https://images.unsplash.com/photo-1526256262350-7da7584cf5eb",
+    "description": "Kegiatan bakti sosial untuk membantu anak-anak panti asuhan dalam edukasi, kebersihan, dan pendampingan belajar.",
+    "requirements": [
+      "Mahasiswa aktif",
+      "Minat dalam kegiatan sosial",
+      "Bersedia mengikuti briefing"
+    ],
+    "benefits": [
+      "Sertifikat relawan",
+      "Makan siang",
+      "Pengalaman sosial nyata"
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Aksi Bersih Pantai",
+    "location": "Ancol, Jakarta",
+    "date": "2026-05-02",
+    "time": "07:00 - 11:00",
+    "organizer": "Gerakan EarthCare",
+    "contact": "0821-1234-5678",
+    "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+    "description": "Gerakan bersih pantai bersama komunitas lingkungan untuk menjaga ekosistem laut.",
+    "requirements": [
+      "Punya jiwa peduli lingkungan",
+      "Bawa sarung tangan dan topi",
+      "Tidak buang sampah selama kegiatan"
+    ],
+    "benefits": [
+      "Sertifikat resmi EarthCare",
+      "Goodie bag eco-friendly",
+      "Relasi komunitas lingkungan"
+    ]
+  }
+]
