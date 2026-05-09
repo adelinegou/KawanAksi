@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Pendaftaran Relawan</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="script.js" defer></script>
+</head>
+<body>
+
+<a href="javascript:history.back()" class="back-btn">← Kembali</a>
+
+<div class="form-container">
+  <h1>Form Pendaftaran Relawan</h1>
+
+  <form id="registerForm">
+    <input type="text" id="fullname" placeholder="Nama Lengkap" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="tel" id="phone" placeholder="Nomor Telepon" required>
+
+    <div class="consent-container">
+        <label class="consent-card">
+            <input type="checkbox" name="agree_terms" required>
+            <span>Saya menyetujui <b>Syarat & Ketentuan</b> relawan Kawan Aksi.</span>
+        </label>
+        
+        <label class="consent-card">
+            <input type="checkbox" name="agree_data" required>
+            <span>Saya mengizinkan data ini diberikan kepada penyelenggara kegiatan.</span>
+        </label>
+    </div>
+
+    <button class="btn-primary" type="submit">Kirim Pendaftaran</button>
+  </form>
+
+  <p id="submitStatus"></p>
+</div>
+
+</body>
+</html>

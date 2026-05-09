@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Kegiatan - Kawan Aksi</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="script.js" defer></script>
+</head>
+<body>
+
+<a href="index.html" class="back-btn">← Kembali</a>
+
+<div class="event-detail-container">
+  <img id="eventImage" class="event-hero" />
+
+  <div class="event-detail-content">
+    <h1 id="eventTitle"></h1>
+
+    <div class="info-section">
+      <h3>Informasi Acara</h3>
+      <p><strong>Lokasi:</strong> <span id="eventLocation"></span></p>
+      <p><strong>Tanggal:</strong> <span id="eventDate"></span></p>
+      <p><strong>Waktu:</strong> <span id="eventTime"></span></p>
+      <p><strong>Penyelenggara:</strong> <span id="eventOrganizer"></span></p>
+      <p><strong>Kontak:</strong> <span id="eventContact"></span></p>
+    </div>
+
+    <div class="info-section">
+      <h3>Deskripsi</h3>
+      <p id="eventDescription"></p>
+    </div>
+
+    <div class="info-section">
+      <h3>Persyaratan Relawan</h3>
+      <ul id="eventRequirements"></ul>
+    </div>
+
+    <div class="info-section">
+      <h3>Benefit</h3>
+      <ul id="eventBenefits"></ul>
+    </div>
+
+    <div class="cta-buttons">
+      <a id="registerBtn" class="btn-primary">Daftar Sekarang</a>
+      <a id="contactBtn" class="btn-secondary" target="_blank">Hubungi Penyelenggara</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

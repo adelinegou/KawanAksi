@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register Event - Kawan Aksi</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="script.js" defer></script>
+</head>
+<body>
+
+<a href="index.html" class="back-btn">← Kembali</a>
+
+<div class="form-container">
+  <h1>Daftarkan Kegiatan Baru</h1>
+
+  <form id="eventRegisterForm">
+    <input type="text" id="evTitle" placeholder="Nama Acara" required>
+    <input type="text" id="evLocation" placeholder="Lokasi" required>
+    <input type="date" id="evDate" required>
+    <input type="text" id="evTime" placeholder="Waktu (misal: 09:00 - 15:00)" required>
+    <input type="text" id="evOrganizer" placeholder="Nama Penyelenggara" required>
+    <input type="tel" id="evContact" placeholder="Nomor Kontak (WhatsApp)" required>
+    <textarea id="evDescription" placeholder="Deskripsi Acara" required></textarea>
+    <textarea id="evRequirements" placeholder="Persyaratan (pisahkan dengan baris baru)" required></textarea>
+    <textarea id="evBenefits" placeholder="Benefit (pisahkan dengan baris baru)" required></textarea>
+
+    <button class="btn-primary" type="submit">Submit</button>
+  </form>
+
+  <p id="eventSubmitStatus"></p>
+</div>
+
+</body>
+</html>
