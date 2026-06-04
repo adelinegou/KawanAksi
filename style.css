@@ -130,6 +130,52 @@ input:focus, textarea:focus {
   box-shadow: 0 0 0 4px rgba(74, 108, 247, 0.1);
 }
 
+input[type="text"]:invalid:not(:placeholder-shown),
+input[type="email"]:invalid:not(:placeholder-shown),
+input[type="tel"]:invalid:not(:placeholder-shown),
+textarea:invalid:not(:placeholder-shown) {
+  border-color: #e74c3c;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 20px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.field-label input {
+  margin: 8px 0 0;
+}
+
+.time-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.image-preview {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin: -8px 0 20px;
+  border: 2px solid #E2E8F0;
+}
+
+.form-status {
+  margin: 16px 0 0;
+  font-weight: 700;
+}
+
+.form-status.error {
+  color: #c0392b;
+}
+
+.form-status.success {
+  color: #27ae60;
+}
+
 button[type="submit"] {
   width: 100%;
   padding: 16px;

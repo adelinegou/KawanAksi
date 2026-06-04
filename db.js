@@ -2,7 +2,7 @@
 export async function fetchEvents() {
   try {
     const localEvents = JSON.parse(localStorage.getItem("custom_events")) || [];
-    const res = await fetch("./data/events.json");
+    const res = await fetch("./events.json");
     const baseEvents = await res.json();
     // Combine both sources
     return [...localEvents, ...baseEvents]; 
@@ -21,7 +21,7 @@ export async function fetchEventById(id) {
 export function saveNewEvent(event) {
   const localEvents = JSON.parse(localStorage.getItem("custom_events")) || [];
   event.id = Date.now();
-  event.image = "https://images.unsplash.com/photo-1559027615-cd26735550b4";
+  event.image = event.image || "https://images.unsplash.com/photo-1559027615-cd26735550b4";
   localEvents.push(event);
   localStorage.setItem("custom_events", JSON.stringify(localEvents));
 }

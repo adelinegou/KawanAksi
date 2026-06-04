@@ -14,12 +14,35 @@
   <h1>Daftarkan Kegiatan Baru</h1>
 
   <form id="eventRegisterForm">
-    <input type="text" id="evTitle" placeholder="Nama Acara" required>
-    <input type="text" id="evLocation" placeholder="Lokasi" required>
+    <input type="text" id="evTitle" placeholder="Nama Acara" minlength="3" required>
+    <input type="text" id="evLocation" placeholder="Lokasi" minlength="3" required>
     <input type="date" id="evDate" required>
-    <input type="text" id="evTime" placeholder="Waktu (misal: 09:00 - 15:00)" required>
-    <input type="text" id="evOrganizer" placeholder="Nama Penyelenggara" required>
-    <input type="tel" id="evContact" placeholder="Nomor Kontak (WhatsApp)" required>
+    <div class="time-row">
+      <label class="field-label">
+        Waktu Mulai
+        <input type="time" id="evStartTime" required>
+      </label>
+      <label class="field-label">
+        Waktu Selesai
+        <input type="time" id="evEndTime" required>
+      </label>
+    </div>
+    <input type="text" id="evOrganizer" placeholder="Nama Penyelenggara" minlength="3" required>
+    <input
+      type="tel"
+      id="evContact"
+      placeholder="Nomor Kontak WhatsApp (+62812...)"
+      autocomplete="tel"
+      inputmode="tel"
+      pattern="\+628[1-9][0-9]{7,11}"
+      title="Gunakan format +62, contoh +6281234567890."
+      required
+    >
+    <label class="field-label">
+      Gambar Kegiatan
+      <input type="file" id="evImage" accept="image/jpeg,image/png,image/webp" required>
+    </label>
+    <img id="evImagePreview" class="image-preview" alt="Preview gambar kegiatan" hidden>
     <textarea id="evDescription" placeholder="Deskripsi Acara" required></textarea>
     <textarea id="evRequirements" placeholder="Persyaratan (pisahkan dengan baris baru)" required></textarea>
     <textarea id="evBenefits" placeholder="Benefit (pisahkan dengan baris baru)" required></textarea>

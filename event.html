@@ -3,49 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Detail Kegiatan - Kawan Aksi</title>
+  <title>Form Pendaftaran Relawan</title>
   <link rel="stylesheet" href="style.css">
   <script type="module" src="script.js" defer></script>
 </head>
 <body>
 
-<a href="index.html" class="back-btn">← Kembali</a>
+<a href="javascript:history.back()" class="back-btn">← Kembali</a>
 
-<div class="event-detail-container">
-  <img id="eventImage" class="event-hero" />
+<div class="form-container">
+  <h1>Form Pendaftaran Relawan</h1>
 
-  <div class="event-detail-content">
-    <h1 id="eventTitle"></h1>
+  <form id="registerForm">
+    <input type="text" id="fullname" placeholder="Nama Lengkap" autocomplete="name" minlength="3" required>
+    <input type="email" id="email" placeholder="Email" autocomplete="email" required>
+    <input
+      type="tel"
+      id="phone"
+      placeholder="Nomor Telepon (+62812...)"
+      autocomplete="tel"
+      inputmode="tel"
+      pattern="\+628[1-9][0-9]{7,11}"
+      title="Gunakan format +62, contoh +6281234567890."
+      required
+    >
 
-    <div class="info-section">
-      <h3>Informasi Acara</h3>
-      <p><strong>Lokasi:</strong> <span id="eventLocation"></span></p>
-      <p><strong>Tanggal:</strong> <span id="eventDate"></span></p>
-      <p><strong>Waktu:</strong> <span id="eventTime"></span></p>
-      <p><strong>Penyelenggara:</strong> <span id="eventOrganizer"></span></p>
-      <p><strong>Kontak:</strong> <span id="eventContact"></span></p>
+    <div class="consent-container">
+        <label class="consent-card">
+            <input type="checkbox" name="agree_terms" required>
+            <span>Saya menyetujui <b>Syarat & Ketentuan</b> relawan Kawan Aksi.</span>
+        </label>
+        
+        <label class="consent-card">
+            <input type="checkbox" name="agree_data" required>
+            <span>Saya mengizinkan data ini diberikan kepada penyelenggara kegiatan.</span>
+        </label>
     </div>
 
-    <div class="info-section">
-      <h3>Deskripsi</h3>
-      <p id="eventDescription"></p>
-    </div>
+    <button class="btn-primary" type="submit">Kirim Pendaftaran</button>
+  </form>
 
-    <div class="info-section">
-      <h3>Persyaratan Relawan</h3>
-      <ul id="eventRequirements"></ul>
-    </div>
-
-    <div class="info-section">
-      <h3>Benefit</h3>
-      <ul id="eventBenefits"></ul>
-    </div>
-
-    <div class="cta-buttons">
-      <a id="registerBtn" class="btn-primary">Daftar Sekarang</a>
-      <a id="contactBtn" class="btn-secondary" target="_blank">Hubungi Penyelenggara</a>
-    </div>
-  </div>
+  <p id="submitStatus"></p>
 </div>
 
 </body>

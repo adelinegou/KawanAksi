@@ -1,37 +1,203 @@
-// script.js
-import { fetchEvents, fetchEventById, saveNewEvent } from "./db.js";
+import {
+  fetchEvents,
+  fetchEventById,
+  saveNewEvent,
+  saveVolunteerSubmission,
+} from "./db.js";
+
+const PHONE_PATTERN = /^\+628[1-9][0-9]{7,11}$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
+const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+function normalizePhone(value) {
+  return value.trim().replace(/[\s().-]/g, "");
+}
+
+function isValidIndonesianMobile(value) {
+  return PHONE_PATTERN.test(normalizePhone(value));
+}
+
+function getWhatsAppDigits(value) {
+  const compact = normalizePhone(value);
+
+  if (compact.startsWith("+62")) {
+    return compact.slice(1).replace(/\D/g, "");
+  }
+
+  if (compact.startsWith("0")) {
+    return `62${compact.slice(1).replace(/\D/g, "")}`;
+  }
+
+  return compact.replace(/\D/g, "");
+}
+
+function isValidEmail(value) {
+  return EMAIL_PATTERN.test(value.trim());
+}
+
+function getDateInputValue(offsetDays = 0) {
+  const date = new Date();
+  date.setHours(0, 0, 0, 0);
+  date.setDate(date.getDate() + offsetDays);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function isFutureDate(value) {
+  if (!value) return false;
+
+  const selectedDate = new Date(`${value}T00:00:00`);
+  const today = new Date(`${getDateInputValue()}T00:00:00`);
+  return selectedDate > today;
+}
+
+function setStatus(id, message, type = "error") {
+  const status = document.getElementById(id);
+  if (!status) return;
+
+  status.textContent = message;
+  status.className = `form-status ${type}`;
+}
+
+function resetFieldValidity(...fields) {
+  fields.forEach((field) => field?.setCustomValidity(""));
+}
+
+function getLines(elementId) {
+  return document
+    .getElementById(elementId)
+    .value.split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function validateTimeRange(startTime, endTime) {
+  if (!startTime || !endTime) return false;
+  return startTime < endTime;
+}
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("Gagal membaca file gambar."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function validateImageInput(input) {
+  const file = input.files?.[0];
+
+  if (!file) {
+    return "Upload gambar kegiatan wajib diisi.";
+  }
+
+  if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+    return "Format gambar harus JPG, PNG, atau WebP.";
+  }
+
+  if (file.size > MAX_IMAGE_SIZE) {
+    return "Ukuran gambar maksimal 2 MB.";
+  }
+
+  return "";
+}
+
+function createEventCard(ev) {
+  const card = document.createElement("div");
+  card.className = "card";
+
+  const image = document.createElement("img");
+  image.src = ev.image;
+  image.alt = ev.title;
+
+  const content = document.createElement("div");
+  content.className = "card-content";
+
+  const title = document.createElement("h3");
+  title.textContent = ev.title;
+
+  const location = document.createElement("p");
+  location.textContent = `Lokasi: ${ev.location}`;
+
+  const link = document.createElement("a");
+  link.href = `event.html?id=${ev.id}`;
+  link.className = "btn-primary";
+  link.textContent = "Lihat Detail";
+
+  content.append(title, location, link);
+  card.append(image, content);
+
+  return card;
+}
 
 // Restore Event Cards on Homepage
 const eventGrid = document.getElementById("eventGrid");
 if (eventGrid) {
-  fetchEvents().then(events => {
+  fetchEvents().then((events) => {
     eventGrid.innerHTML = "";
-    events.forEach(ev => {
-      const card = document.createElement("div");
-      card.className = "card"; // Matches restored CSS
-      card.innerHTML = `
-        <img src="${ev.image}">
-        <div class="card-content">
-          <h3>${ev.title}</h3>
-          <p>📍 ${ev.location}</p>
-          <a href="event.html?id=${ev.id}" class="btn-primary">Lihat Detail</a>
-        </div>
-      `;
-      eventGrid.appendChild(card);
+    events.forEach((ev) => {
+      eventGrid.appendChild(createEventCard(ev));
     });
   });
 }
 
-// Volunteer Registration Success Logic
+// Volunteer Registration Logic
 const registerForm = document.getElementById("registerForm");
 if (registerForm) {
-  registerForm.addEventListener("submit", e => {
+  const fullNameInput = document.getElementById("fullname");
+  const emailInput = document.getElementById("email");
+  const phoneInput = document.getElementById("phone");
+
+  registerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    
-    // Hide form and show success message
+    resetFieldValidity(fullNameInput, emailInput, phoneInput);
+
+    const fullName = fullNameInput.value.trim();
+    const email = emailInput.value.trim();
+    const phone = normalizePhone(phoneInput.value);
+
+    if (fullName.length < 3) {
+      fullNameInput.setCustomValidity("Nama lengkap minimal 3 karakter.");
+      fullNameInput.reportValidity();
+      setStatus("submitStatus", "Periksa kembali nama lengkap.");
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      emailInput.setCustomValidity("Masukkan email yang valid.");
+      emailInput.reportValidity();
+      setStatus("submitStatus", "Periksa kembali alamat email.");
+      return;
+    }
+
+    if (!isValidIndonesianMobile(phone)) {
+      phoneInput.setCustomValidity("Nomor telepon harus diawali +62 dan bisa dipakai WhatsApp.");
+      phoneInput.reportValidity();
+      setStatus("submitStatus", "Gunakan format nomor seperti +6281234567890.");
+      return;
+    }
+
+    if (!registerForm.reportValidity()) return;
+
+    const eventId = new URLSearchParams(window.location.search).get("id");
+    const event = eventId ? await fetchEventById(eventId) : null;
+
+    saveVolunteerSubmission({
+      eventId,
+      eventTitle: event?.title || "",
+      fullName,
+      email,
+      phone,
+    });
+
     registerForm.innerHTML = `
       <div style="text-align: center; padding: 20px;">
-        <h2 style="color: #2ecc71;">✔️ Pendaftaran Berhasil!</h2>
+        <h2 style="color: #2ecc71;">Pendaftaran Berhasil!</h2>
         <p>Terima kasih telah bergabung. Panitia akan segera menghubungi Anda.</p>
         <br>
         <a href="index.html" class="btn-primary">Kembali ke Daftar Kegiatan</a>
@@ -40,15 +206,16 @@ if (registerForm) {
   });
 }
 
-// --- DETAIL PAGE LOGIC ---
+// Detail Page Logic
 if (window.location.pathname.includes("event.html")) {
   const urlParams = new URLSearchParams(window.location.search);
   const id = urlParams.get("id");
 
   if (id) {
-    fetchEventById(id).then(ev => {
+    fetchEventById(id).then((ev) => {
       if (!ev) return;
       document.getElementById("eventImage").src = ev.image;
+      document.getElementById("eventImage").alt = ev.title;
       document.getElementById("eventTitle").textContent = ev.title;
       document.getElementById("eventLocation").textContent = ev.location;
       document.getElementById("eventDate").textContent = ev.date;
@@ -57,11 +224,10 @@ if (window.location.pathname.includes("event.html")) {
       document.getElementById("eventContact").textContent = ev.contact;
       document.getElementById("eventDescription").textContent = ev.description;
 
-      // Render Lists
       const renderList = (data, elementId) => {
         const el = document.getElementById(elementId);
         el.innerHTML = "";
-        data.forEach(item => {
+        data.forEach((item) => {
           const li = document.createElement("li");
           li.textContent = item;
           el.appendChild(li);
@@ -72,30 +238,106 @@ if (window.location.pathname.includes("event.html")) {
       renderList(ev.benefits, "eventBenefits");
 
       document.getElementById("registerBtn").href = `register.html?id=${ev.id}`;
-      document.getElementById("contactBtn").href = `https://wa.me/${ev.contact.replace(/\D/g,'')}`;
+      document.getElementById("contactBtn").href = `https://wa.me/${getWhatsAppDigits(ev.contact)}`;
     });
   }
 }
 
-// --- CREATE EVENT FORM ---
+// Create Event Form
 const eventRegisterForm = document.getElementById("eventRegisterForm");
 if (eventRegisterForm) {
-  eventRegisterForm.addEventListener("submit", (e) => {
+  const dateInput = document.getElementById("evDate");
+  const startTimeInput = document.getElementById("evStartTime");
+  const endTimeInput = document.getElementById("evEndTime");
+  const contactInput = document.getElementById("evContact");
+  const imageInput = document.getElementById("evImage");
+  const imagePreview = document.getElementById("evImagePreview");
+
+  dateInput.min = getDateInputValue(1);
+
+  imageInput.addEventListener("change", async () => {
+    resetFieldValidity(imageInput);
+    const imageError = validateImageInput(imageInput);
+
+    if (imageError) {
+      imageInput.setCustomValidity(imageError);
+      imageInput.reportValidity();
+      imagePreview.hidden = true;
+      imagePreview.removeAttribute("src");
+      return;
+    }
+
+    imagePreview.src = await fileToDataUrl(imageInput.files[0]);
+    imagePreview.hidden = false;
+  });
+
+  eventRegisterForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    resetFieldValidity(dateInput, startTimeInput, endTimeInput, contactInput, imageInput);
+
+    if (!isFutureDate(dateInput.value)) {
+      dateInput.setCustomValidity("Tanggal kegiatan harus setelah hari ini.");
+      dateInput.reportValidity();
+      setStatus("eventSubmitStatus", "Tanggal kegiatan wajib lebih dari hari ini.");
+      return;
+    }
+
+    if (!validateTimeRange(startTimeInput.value, endTimeInput.value)) {
+      endTimeInput.setCustomValidity("Waktu selesai harus setelah waktu mulai.");
+      endTimeInput.reportValidity();
+      setStatus("eventSubmitStatus", "Periksa kembali waktu kegiatan.");
+      return;
+    }
+
+    if (!isValidIndonesianMobile(contactInput.value)) {
+      contactInput.setCustomValidity("Nomor kontak harus diawali +62 dan bisa dipakai WhatsApp.");
+      contactInput.reportValidity();
+      setStatus("eventSubmitStatus", "Gunakan nomor WhatsApp dengan format +6281234567890.");
+      return;
+    }
+
+    const imageError = validateImageInput(imageInput);
+    if (imageError) {
+      imageInput.setCustomValidity(imageError);
+      imageInput.reportValidity();
+      setStatus("eventSubmitStatus", imageError);
+      return;
+    }
+
+    if (!eventRegisterForm.reportValidity()) return;
+
+    const requirements = getLines("evRequirements");
+    const benefits = getLines("evBenefits");
+
+    if (!requirements.length || !benefits.length) {
+      setStatus("eventSubmitStatus", "Persyaratan dan benefit minimal berisi satu baris.");
+      return;
+    }
+
     const eventData = {
-      title: document.getElementById("evTitle").value,
-      location: document.getElementById("evLocation").value,
-      date: document.getElementById("evDate").value,
-      time: document.getElementById("evTime").value,
-      organizer: document.getElementById("evOrganizer").value,
-      contact: document.getElementById("evContact").value,
-      description: document.getElementById("evDescription").value,
-      requirements: document.getElementById("evRequirements").value.split("\n").filter(r => r.trim()),
-      benefits: document.getElementById("evBenefits").value.split("\n").filter(b => b.trim()),
+      title: document.getElementById("evTitle").value.trim(),
+      location: document.getElementById("evLocation").value.trim(),
+      date: dateInput.value,
+      time: `${startTimeInput.value} - ${endTimeInput.value}`,
+      organizer: document.getElementById("evOrganizer").value.trim(),
+      contact: normalizePhone(contactInput.value),
+      image: await fileToDataUrl(imageInput.files[0]),
+      description: document.getElementById("evDescription").value.trim(),
+      requirements,
+      benefits,
     };
 
-    saveNewEvent(eventData);
-    document.getElementById("eventSubmitStatus").textContent = "Kegiatan berhasil didaftarkan!";
-    setTimeout(() => window.location.href = "index.html", 1200);
+    try {
+      saveNewEvent(eventData);
+    } catch (error) {
+      console.error("Gagal menyimpan kegiatan:", error);
+      setStatus("eventSubmitStatus", "Gagal menyimpan kegiatan. Coba gunakan gambar yang lebih kecil.");
+      return;
+    }
+
+    setStatus("eventSubmitStatus", "Kegiatan berhasil didaftarkan!", "success");
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 1200);
   });
 }
