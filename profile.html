@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil Relawan - Kawan Aksi</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="script.js" defer></script>
+</head>
+<body>
+
+<header>
+  <h1>Profil Saya</h1>
+  <p>Kelola data diri dan akun relawanmu di sini.</p>
+</header>
+
+<main class="form-container">
+  <form id="profileForm">
+    <label class="field-label">
+      Nama Lengkap
+      <input type="text" id="profName" required>
+    </label>
+    <label class="field-label">
+      Email
+      <input type="email" id="profEmail" required>
+    </label>
+    <label class="field-label">
+      Nomor Telepon (WhatsApp)
+      <input type="tel" id="profPhone" required placeholder="+628...">
+    </label>
+    <button type="submit" class="btn-primary">Simpan Profil</button>
+    <p id="profileStatus" class="form-status"></p>
+  </form>
+  
+  <div style="text-align: center; margin-top: 30px;">
+    <a href="index.html" class="back-btn">Kembali ke Beranda</a>
+  </div>
+</main>
+
+</body>
+</html>

@@ -31,3 +31,16 @@ export function saveVolunteerSubmission(data) {
     volunteers.push({ ...data, timestamp: new Date() });
     localStorage.setItem('kawanaksi_volunteers', JSON.stringify(volunteers));
 }
+// Tambahkan di baris paling bawah db.js
+
+export function getMySubmissions() {
+  return JSON.parse(localStorage.getItem("kawanaksi_volunteers")) || [];
+}
+
+export function getProfile() {
+  return JSON.parse(localStorage.getItem("kawanaksi_profile")) || { name: "", email: "", phone: "" };
+}
+
+export function saveProfile(data) {
+  localStorage.setItem("kawanaksi_profile", JSON.stringify(data));
+}

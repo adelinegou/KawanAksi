@@ -3,6 +3,9 @@ import {
   fetchEventById,
   saveNewEvent,
   saveVolunteerSubmission,
+  getMySubmissions, 
+  getProfile,       
+  saveProfile       
 } from "./db.js";
 
 const PHONE_PATTERN = /^\+628[1-9][0-9]{7,11}$/;
@@ -339,5 +342,83 @@ if (eventRegisterForm) {
     setTimeout(() => {
       window.location.href = "index.html";
     }, 1200);
+  });
+}
+
+
+// ==========================================
+// User Profile Logic
+// ==========================================
+const profileForm = document.getElementById("profileForm");
+if (profileForm) {
+  const profName = document.getElementById("profName");
+  const profEmail = document.getElementById("profEmail");
+  const profPhone = document.getElementById("profPhone");
+
+  // Load existing profile kalau udah pernah disimpen
+  const profile = getProfile();
+  profName.value = profile.name || "";
+  profEmail.value = profile.email || "";
+  profPhone.value = profile.phone || "";
+
+  profileForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    
+    // Validasi dikit biar data rapi
+    if (!isValidEmail(profEmail.value)) {
+      setStatus("profileStatus", "Masukkan email yang valid.", "error");
+      return;
+    }
+    if (!isValidIndonesianMobile(profPhone.value)) {
+      setStatus("profileStatus", "Gunakan nomor +62...", "error");
+      return;
+    }
+
+    saveProfile({
+      name: profName.value.trim(),
+      email: profEmail.value.trim(),
+      phone: normalizePhone(profPhone.value)
+    });
+
+    setStatus("profileStatus", "Profil berhasil disimpan!", "success");
+  });
+}
+
+// ==========================================
+// My Events Logic
+// ==========================================
+const myEventGrid = document.getElementById("myEventGrid");
+if (myEventGrid) {
+  const submissions = getMySubmissions();
+  
+  fetchEvents().then((events) => {
+    myEventGrid.innerHTML = "";
+    
+    if (submissions.length === 0) {
+      myEventGrid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+          <p>Kamu belum mendaftar kegiatan apapun. Yuk cari event di beranda!</p>
+        </div>`;
+      return;
+    }
+
+    // Hindari event yang sama dirender dobel kalau user daftar 2x
+    const uniqueEventIds = [...new Set(submissions.map(sub => sub.eventId))];
+
+    uniqueEventIds.forEach((eventId) => {
+      // Cocokin ID event dari submission dengan database event
+      const ev = events.find((e) => String(e.id) === String(eventId));
+      if (ev) {
+        // Pake fungsi createEventCard yang udah lu bikin sebelumnya
+        const card = createEventCard(ev);
+        
+        // Modif sedikit tombolnya khusus di halaman My Event
+        const link = card.querySelector('a');
+        link.textContent = "Lihat Detail Pendaftaran";
+        link.style.backgroundColor = "#27ae60"; // Ganti ijo biar beda
+        
+        myEventGrid.appendChild(card);
+      }
+    });
   });
 }
