@@ -321,6 +321,7 @@ if (window.location.pathname.includes("event.html")) {
         ? getSubmissionByEventAndUser(ev.id, currentUser.id, currentUser.email)
         : null;
 
+      const editBtn = document.getElementById("editRegistrationBtn");
       if (submission) {
         const notice = document.getElementById("registrationNotice");
         const details = document.getElementById("registrationDetails");
@@ -331,11 +332,11 @@ if (window.location.pathname.includes("event.html")) {
           registerBtn.textContent = "Sudah Terdaftar";
         }
 
-      const editBtn = document.getElementById("editRegistrationBtn");
-      if (editBtn) {
-        editBtn.hidden = false;
-        editBtn.href = `register.html?id=${ev.id}&edit=true`;
-      }
+        if (editBtn) {
+          editBtn.hidden = false;
+          editBtn.style.display = "inline-flex";
+          editBtn.href = `register.html?id=${ev.id}&edit=true`;
+        }
 
         if (details) {
           details.hidden = false;
@@ -347,6 +348,9 @@ if (window.location.pathname.includes("event.html")) {
             <p><strong>Tanggal Daftar:</strong> ${new Date(submission.timestamp).toLocaleString()}</p>
           `;
         }
+      } else if (editBtn) {
+        editBtn.hidden = true;
+        editBtn.style.display = "none";
       }
     });
   }
