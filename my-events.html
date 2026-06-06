@@ -17,28 +17,20 @@
       position: relative;
     }
 
-    /* Back button INSIDE header but styled like event page (white, blue text) */
-    .back-btn-white {
+    /* Back button - positioned on the LEFT */
+    .my-events-header .back-btn {
       position: absolute;
       left: 24px;
       top: 50%;
       transform: translateY(-50%);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: white;
-      color: var(--primary);
-      padding: 10px 20px;
-      border-radius: 50px;
-      text-decoration: none;
-      font-weight: 600;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      margin: 0;
       transition: all 0.3s ease;
     }
 
-    .back-btn-white:hover {
-      transform: translateY(-50%) translateX(-4px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    /* Hover effect - moves UP slightly (just a little) */
+    .my-events-header .back-btn:hover {
+      transform: translateY(-52%);
+      background: #f0f3ff;
     }
 
     .my-events-header h1 {
@@ -102,7 +94,7 @@
 <body>
 
 <header class="my-events-header">
-  <a href="index.html" class="back-btn-white">Back</a>
+  <a href="index.html" class="back-btn">Back</a>
   <h1>My Events</h1>
 </header>
 
