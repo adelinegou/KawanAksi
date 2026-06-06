@@ -3,47 +3,218 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Form Pendaftaran Relawan</title>
+  <title>Detail Kegiatan - Kawan Aksi</title>
   <link rel="stylesheet" href="style.css">
   <script type="module" src="script.js" defer></script>
+  <style>
+    /* Additional styles for Figma-like design */
+    .detail-banner {
+      width: 100%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+
+    .event-title {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 24px;
+      color: #1a1a2e;
+    }
+
+    .info-section {
+      background: #f8fafc;
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .info-section h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #1a1a2e;
+      border-left: 4px solid #4a6cf7;
+      padding-left: 12px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .info-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .info-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .description-text {
+      line-height: 1.7;
+      color: #334155;
+      margin-bottom: 24px;
+    }
+
+    .requirements-list, .benefits-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .requirements-list li, .benefits-list li {
+      padding: 10px 0;
+      padding-left: 24px;
+      position: relative;
+      color: #334155;
+    }
+
+    .requirements-list li:before {
+      content: "✓";
+      color: #e74c3c;
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+
+    .benefits-list li:before {
+      content: "✓";
+      color: #27ae60;
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 16px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    .btn-register {
+      flex: 1;
+      background: #4a6cf7;
+      color: white;
+      padding: 16px 32px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 700;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .btn-register:hover {
+      background: #3249b3;
+      transform: translateY(-2px);
+    }
+
+    .btn-wa {
+      background: #25D366;
+      color: white;
+      padding: 16px 32px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 700;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .btn-wa:hover {
+      background: #128C7E;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+      .detail-banner {
+        height: 180px;
+      }
+      
+      .event-title {
+        font-size: 24px;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<a href="javascript:history.back()" class="back-btn">← Kembali</a>
+<a href="index.html" class="back-btn">← Kembali</a>
 
-<div class="form-container">
-  <h1>Form Pendaftaran Relawan</h1>
-
-  <form id="registerForm">
-    <input type="text" id="fullname" placeholder="Nama Lengkap" autocomplete="name" minlength="3" required>
-    <input type="email" id="email" placeholder="Email" autocomplete="email" required>
-    <input
-      type="tel"
-      id="phone"
-      placeholder="Nomor Telepon (+62812...)"
-      autocomplete="tel"
-      inputmode="tel"
-      pattern="\+628[1-9][0-9]{7,11}"
-      title="Gunakan format +62, contoh +6281234567890."
-      required
-    >
-
-    <div class="consent-container">
-        <label class="consent-card">
-            <input type="checkbox" name="agree_terms" required>
-            <span>Saya menyetujui <b>Syarat & Ketentuan</b> relawan Kawan Aksi.</span>
-        </label>
-        
-        <label class="consent-card">
-            <input type="checkbox" name="agree_data" required>
-            <span>Saya mengizinkan data ini diberikan kepada penyelenggara kegiatan.</span>
-        </label>
+<div class="event-detail-container">
+  <!-- Banner / Iklan Event -->
+  <img id="eventImage" class="detail-banner" alt="Gambar kegiatan">
+  
+  <!-- Judul Event -->
+  <h1 class="event-title" id="eventTitle"></h1>
+  
+  <!-- Informasi Acara Section -->
+  <div class="info-section">
+    <h3>Informasi Acara</h3>
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="info-label">Lokasi</span>
+        <span class="info-value" id="eventLocation"></span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Tanggal</span>
+        <span class="info-value" id="eventDate"></span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Waktu</span>
+        <span class="info-value" id="eventTime"></span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Penyelenggara</span>
+        <span class="info-value" id="eventOrganizer"></span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Kontak</span>
+        <span class="info-value" id="eventContact"></span>
+      </div>
     </div>
-
-    <button class="btn-primary" type="submit">Kirim Pendaftaran</button>
-  </form>
-
-  <p id="submitStatus"></p>
+  </div>
+  
+  <!-- Deskripsi Section -->
+  <div class="info-section">
+    <h3>Deskripsi</h3>
+    <p class="description-text" id="eventDescription"></p>
+  </div>
+  
+  <!-- Persyaratan Section -->
+  <div class="info-section">
+    <h3>Persyaratan</h3>
+    <ul class="requirements-list" id="eventRequirements"></ul>
+  </div>
+  
+  <!-- Benefit Section -->
+  <div class="info-section">
+    <h3>Benefit</h3>
+    <ul class="benefits-list" id="eventBenefits"></ul>
+  </div>
+  
+  <!-- Tombol Aksi -->
+  <div class="action-buttons">
+    <a id="registerBtn" href="#" class="btn-register">Daftar Sekarang</a>
+    <a id="contactBtn" href="#" class="btn-wa">Hubungi via WhatsApp</a>
+  </div>
 </div>
 
 </body>
