@@ -10,8 +10,10 @@
 <body>
 
 <header>
-  <h1>Profil Saya</h1>
-  <p>Kelola data diri dan akun relawanmu di sini.</p>
+  <div style="text-align: left; margin-bottom: 20px;">
+    <a href="javascript:history.back()" class="back-btn" style="margin: 0; display: inline-block;">Back</a>
+  </div>
+  <h1>Profile</h1>
 </header>
 
 <main class="form-container">
@@ -28,14 +30,67 @@
       Nomor Telepon (WhatsApp)
       <input type="tel" id="profPhone" required placeholder="+628...">
     </label>
-    <button type="submit" class="btn-primary">Simpan Profil</button>
+    <button type="submit" class="btn-primary">Save Profile</button>
     <p id="profileStatus" class="form-status"></p>
   </form>
-  
-  <div style="text-align: center; margin-top: 30px;">
-    <a href="index.html" class="back-btn">Kembali ke Beranda</a>
-  </div>
 </main>
+
+<script type="module">
+  import { getProfile, saveProfile } from './db.js';
+  import { getUserSession } from './auth.js';
+
+  function normalizePhone(value) {
+    return value.trim().replace(/[\s().-]/g, "");
+  }
+
+  function isValidEmail(value) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value.trim());
+  }
+
+  function isValidIndonesianMobile(value) {
+    return /^\+628[1-9][0-9]{7,11}$/.test(normalizePhone(value));
+  }
+
+  const user = getUserSession();
+  
+  if (!user) {
+    window.location.href = 'login.html';
+  }
+
+  const profName = document.getElementById('profName');
+  const profEmail = document.getElementById('profEmail');
+  const profPhone = document.getElementById('profPhone');
+
+  const profile = getProfile(user.email);
+  profName.value = profile.name || user.name || "";
+  profEmail.value = profile.email || user.email || "";
+  profPhone.value = profile.phone || "";
+
+  document.getElementById('profileForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    if (!isValidEmail(profEmail.value)) {
+      document.getElementById('profileStatus').textContent = 'Masukkan email yang valid.';
+      document.getElementById('profileStatus').style.color = 'red';
+      return;
+    }
+    
+    if (!isValidIndonesianMobile(profPhone.value)) {
+      document.getElementById('profileStatus').textContent = 'Gunakan nomor +62...';
+      document.getElementById('profileStatus').style.color = 'red';
+      return;
+    }
+
+    saveProfile(user.email, {
+      name: profName.value.trim(),
+      email: profEmail.value.trim(),
+      phone: normalizePhone(profPhone.value)
+    });
+
+    document.getElementById('profileStatus').textContent = 'Profil berhasil disimpan!';
+    document.getElementById('profileStatus').style.color = '#27ae60';
+  });
+</script>
 
 </body>
 </html>
