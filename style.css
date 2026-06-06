@@ -633,3 +633,16 @@ textarea::placeholder {
     flex-direction: column;
   }
 }
+
+/* Dropdown menu styles */
+#dropdownMenu a:hover {
+  background: #f1f5f9;
+}
+
+#dropdownMenu a:first-child:hover {
+  background: #f1f5f9;
+}
+
+#logoutMenuBtn:hover {
+  background: #fee2e2 !important;
+}
