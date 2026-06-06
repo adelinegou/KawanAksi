@@ -3,23 +3,174 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kegiatanku - Kawan Aksi</title>
+  <title>My Events - Kawan Aksi</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Header styling */
+    .my-events-header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      padding: 40px 20px;
+      color: white;
+      text-align: center;
+      border-radius: 0 0 32px 32px;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    /* Back button INSIDE header but styled like event page (white, blue text) */
+    .back-btn-white {
+      position: absolute;
+      left: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      color: var(--primary);
+      padding: 10px 20px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s ease;
+    }
+
+    .back-btn-white:hover {
+      transform: translateY(-50%) translateX(-4px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .my-events-header h1 {
+      font-size: 2.5rem;
+      margin: 0;
+    }
+
+    /* Centered grid */
+    .centered-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 30px;
+      justify-items: center;
+      align-items: start;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .centered-grid .card {
+      width: 100%;
+      max-width: 380px;
+    }
+
+    /* Empty state styling */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      background: white;
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      max-width: 500px;
+      margin: 40px auto;
+    }
+
+    .empty-state p {
+      color: var(--text-light);
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+    }
+
+    /* Custom button for detail */
+    .btn-detail {
+      background: #27ae60;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+
+    .btn-detail:hover {
+      background: #219a52;
+      transform: translateY(-2px);
+    }
+  </style>
   <script type="module" src="script.js" defer></script>
 </head>
 <body>
 
-<header>
-  <h1>Kegiatanku</h1>
-  <p>Daftar kegiatan sosial yang sudah kamu ikuti.</p>
-  <div class="page-actions">
-    <a href="index.html" class="back-btn">Kembali ke Beranda</a>
-  </div>
+<header class="my-events-header">
+  <a href="index.html" class="back-btn-white">← Kembali</a>
+  <h1>My Events</h1>
 </header>
 
 <main>
-  <div class="grid" id="myEventGrid"></div>
+  <div class="centered-grid" id="myEventGrid">
+    <!-- Events will be loaded here -->
+  </div>
 </main>
+
+<script type="module">
+  import { fetchEvents } from './db.js';
+  import { getMySubmissions } from './db.js';
+  import { getUserSession, requireAuth } from './auth.js';
+
+  // Check if user is logged in
+  requireAuth();
+
+  const user = getUserSession();
+  const mySubmissions = getMySubmissions(user.email);
+  const allEvents = await fetchEvents();
+
+  const gridContainer = document.getElementById('myEventGrid');
+
+  if (!mySubmissions || mySubmissions.length === 0) {
+    // Empty state - no events registered
+    gridContainer.innerHTML = `
+      <div class="empty-state" style="grid-column: 1 / -1;">
+        <p>✨ Kamu belum mendaftar kegiatan apapun</p>
+        <a href="index.html" class="btn-primary">Jelajahi Kegiatan</a>
+      </div>
+    `;
+  } else {
+    // Get unique event IDs from submissions
+    const uniqueEventIds = [...new Set(mySubmissions.map(sub => sub.eventId))];
+    
+    // Filter events that user has applied to
+    const myEvents = uniqueEventIds
+      .map(eventId => allEvents.find(e => String(e.id) === String(eventId)))
+      .filter(event => event !== undefined);
+
+    if (myEvents.length === 0) {
+      gridContainer.innerHTML = `
+        <div class="empty-state" style="grid-column: 1 / -1;">
+          <p>📋 Kegiatan yang kamu daftar tidak ditemukan</p>
+          <a href="index.html" class="btn-primary">Lihat Kegiatan Tersedia</a>
+        </div>
+      `;
+    } else {
+      // Create cards for each event
+      myEvents.forEach(event => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        
+        card.innerHTML = `
+          <img src="${event.image}" alt="${event.title}">
+          <div class="card-content">
+            <h3>${event.title}</h3>
+            <p>📍 ${event.location}</p>
+            <p>📅 ${event.date}</p>
+            <a href="event.html?id=${event.id}" class="btn-detail">Lihat Detail Pendaftaran</a>
+          </div>
+        `;
+        
+        gridContainer.appendChild(card);
+      });
+    }
+  }
+</script>
 
 </body>
 </html>
