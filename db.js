@@ -28,10 +28,37 @@ export function saveNewEvent(event) {
 
 export function saveVolunteerSubmission(data) {
     const volunteers = JSON.parse(localStorage.getItem('kawanaksi_volunteers')) || [];
-    volunteers.push({ ...data, timestamp: new Date() });
+    volunteers.push({
+      id: data.id || Date.now(),
+      ...data,
+      userId: data.userId || null,
+      timestamp: new Date(),
+    });
     localStorage.setItem('kawanaksi_volunteers', JSON.stringify(volunteers));
 }
-// Tambahkan di baris paling bawah db.js
+
+export function updateVolunteerSubmission(id, updates) {
+  const volunteers = JSON.parse(localStorage.getItem('kawanaksi_volunteers')) || [];
+  const index = volunteers.findIndex((submission) => String(submission.id) === String(id));
+  if (index === -1) return null;
+  volunteers[index] = {
+    ...volunteers[index],
+    ...updates,
+    timestamp: new Date(),
+  };
+  localStorage.setItem('kawanaksi_volunteers', JSON.stringify(volunteers));
+  return volunteers[index];
+}
+
+export function getSubmissionByEventAndUser(eventId, userId, email) {
+  const volunteers = JSON.parse(localStorage.getItem('kawanaksi_volunteers')) || [];
+  return volunteers.find((submission) => {
+    const sameEvent = String(submission.eventId) === String(eventId);
+    if (!sameEvent) return false;
+    if (userId != null && submission.userId === userId) return true;
+    return email && submission.email === email;
+  });
+}
 
 export function getMySubmissions() {
   return JSON.parse(localStorage.getItem("kawanaksi_volunteers")) || [];

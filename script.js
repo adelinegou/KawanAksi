@@ -3,7 +3,9 @@ import {
   fetchEventById,
   saveNewEvent,
   saveVolunteerSubmission,
+  updateVolunteerSubmission,
   getMySubmissions,
+  getSubmissionByEventAndUser,
   getProfile,
   saveProfile,
   getCurrentUser,
@@ -196,6 +198,27 @@ if (registerForm) {
   const fullNameInput = document.getElementById("fullname");
   const emailInput = document.getElementById("email");
   const phoneInput = document.getElementById("phone");
+  const queryParams = new URLSearchParams(window.location.search);
+  const eventId = queryParams.get("id");
+  const editMode = queryParams.get("edit") === "true";
+  let currentSubmission = null;
+
+  if (currentUser) {
+    fullNameInput.value = currentUser.name || "";
+    emailInput.value = currentUser.email || "";
+    phoneInput.value = currentUser.phone || "";
+  }
+
+  if (eventId && currentUser) {
+    currentSubmission = getSubmissionByEventAndUser(eventId, currentUser.id, currentUser.email);
+    if (editMode && currentSubmission) {
+      fullNameInput.value = currentSubmission.fullName || fullNameInput.value;
+      emailInput.value = currentSubmission.email || emailInput.value;
+      phoneInput.value = currentSubmission.phone || phoneInput.value;
+      const submitBtn = registerForm.querySelector("button[type=submit]");
+      if (submitBtn) submitBtn.textContent = "Perbarui Pendaftaran";
+    }
+  }
 
   registerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -228,16 +251,21 @@ if (registerForm) {
 
     if (!registerForm.reportValidity()) return;
 
-    const eventId = new URLSearchParams(window.location.search).get("id");
     const event = eventId ? await fetchEventById(eventId) : null;
-
-    saveVolunteerSubmission({
+    const submissionData = {
       eventId,
       eventTitle: event?.title || "",
       fullName,
       email,
       phone,
-    });
+      userId: currentUser?.id || null,
+    };
+
+    if (editMode && currentSubmission) {
+      updateVolunteerSubmission(currentSubmission.id, submissionData);
+    } else {
+      saveVolunteerSubmission(submissionData);
+    }
 
     registerForm.innerHTML = `
       <div style="text-align: center; padding: 20px;">
@@ -281,8 +309,45 @@ if (window.location.pathname.includes("event.html")) {
       renderList(ev.requirements, "eventRequirements");
       renderList(ev.benefits, "eventBenefits");
 
-      document.getElementById("registerBtn").href = `register.html?id=${ev.id}`;
+      const registerBtn = document.getElementById("registerBtn");
+      if (registerBtn) {
+        registerBtn.href = `register.html?id=${ev.id}`;
+        registerBtn.classList.remove("disabled");
+        registerBtn.textContent = "Daftar Sekarang";
+      }
       document.getElementById("contactBtn").href = `https://wa.me/${getWhatsAppDigits(ev.contact)}`;
+
+      const submission = currentUser
+        ? getSubmissionByEventAndUser(ev.id, currentUser.id, currentUser.email)
+        : null;
+
+      if (submission) {
+        const notice = document.getElementById("registrationNotice");
+        const details = document.getElementById("registrationDetails");
+
+        if (registerBtn) {
+          registerBtn.removeAttribute("href");
+          registerBtn.classList.add("disabled");
+          registerBtn.textContent = "Sudah Terdaftar";
+        }
+
+      const editBtn = document.getElementById("editRegistrationBtn");
+      if (editBtn) {
+        editBtn.hidden = false;
+        editBtn.href = `register.html?id=${ev.id}&edit=true`;
+      }
+
+        if (details) {
+          details.hidden = false;
+          details.innerHTML = `
+            <strong>Detail Pendaftaran Kamu</strong>
+            <p><strong>Nama:</strong> ${submission.fullName}</p>
+            <p><strong>Email:</strong> ${submission.email}</p>
+            <p><strong>Telepon:</strong> ${submission.phone}</p>
+            <p><strong>Tanggal Daftar:</strong> ${new Date(submission.timestamp).toLocaleString()}</p>
+          `;
+        }
+      }
     });
   }
 }
@@ -294,10 +359,16 @@ if (eventRegisterForm) {
   const startTimeInput = document.getElementById("evStartTime");
   const endTimeInput = document.getElementById("evEndTime");
   const contactInput = document.getElementById("evContact");
+  const organizerInput = document.getElementById("evOrganizer");
   const imageInput = document.getElementById("evImage");
   const imagePreview = document.getElementById("evImagePreview");
 
   dateInput.min = getDateInputValue(1);
+
+  if (currentUser) {
+    organizerInput.value = currentUser.name || "";
+    contactInput.value = currentUser.phone || "";
+  }
 
   imageInput.addEventListener("change", async () => {
     resetFieldValidity(imageInput);
@@ -468,6 +539,7 @@ if (myEventGrid) {
         // Modif sedikit tombolnya khusus di halaman My Event
         const link = card.querySelector('a');
         link.textContent = "Lihat Detail Pendaftaran";
+        link.href = `event.html?id=${ev.id}&registered=true`;
         link.style.backgroundColor = "#27ae60"; // Ganti ijo biar beda
         
         myEventGrid.appendChild(card);
