@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Daftar - Kawan Aksi</title>
+
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="auth.js" defer></script>
+</head>
+<body>
+
+<div class="form-container">
+
+  <h1>Register</h1>
+
+  <form id="signupForm">
+
+    <input
+      type="text"
+      id="signupName"
+      placeholder="Nama Lengkap"
+      required
+    >
+
+    <input
+      type="email"
+      id="signupEmail"
+      placeholder="Email"
+      required
+    >
+
+    <input
+      type="password"
+      id="signupPassword"
+      placeholder="Password"
+      minlength="6"
+      required
+    >
+
+    <select id="signupRole" required>
+      <option value="">Pilih Role</option>
+      <option value="volunteer">Volunteer</option>
+      <option value="organizer">Event Organizer</option>
+    </select>
+
+    <button type="submit">
+      Daftar
+    </button>
+
+  </form>
+
+  <p id="signupStatus" class="form-status"></p>
+
+<p style="text-align:center; margin-top:20px;">
+  Sudah punya akun?
+  <a href="login.html">Login di sini</a>
+</p>
+
+</div>
+
+</body>
+</html>

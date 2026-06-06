@@ -8,6 +8,42 @@ import {
   saveProfile       
 } from "./db.js";
 
+const currentUser =
+  JSON.parse(localStorage.getItem("currentUser"));
+
+const currentPage =
+  window.location.pathname.split("/").pop();
+
+if (
+  !currentUser &&
+  currentPage !== "login.html" &&
+  currentPage !== "signup.html"
+) {
+  window.location.href = "login.html";
+}
+
+const userInfo =
+  document.getElementById("userInfo");
+
+if (userInfo && currentUser) {
+
+  userInfo.innerHTML = `
+    <span>${currentUser.name} (${currentUser.role})</span>
+    <button id="logoutBtn">Logout</button>
+  `;
+
+  document
+    .getElementById("logoutBtn")
+    .addEventListener("click", () => {
+
+      localStorage.removeItem("currentUser");
+
+      window.location.href =
+        "login.html";
+    });
+}
+
+
 const PHONE_PATTERN = /^\+628[1-9][0-9]{7,11}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024;

@@ -44,3 +44,49 @@ export function getProfile() {
 export function saveProfile(data) {
   localStorage.setItem("kawanaksi_profile", JSON.stringify(data));
 }
+
+export function getUsers() {
+  return JSON.parse(
+    localStorage.getItem("kawanaksi_users")
+  ) || [];
+}
+
+export function saveUser(user) {
+  const users = getUsers();
+
+  user.id = Date.now();
+
+  users.push(user);
+
+  localStorage.setItem(
+    "kawanaksi_users",
+    JSON.stringify(users)
+  );
+}
+
+export function findUser(email, password) {
+  const users = getUsers();
+
+  return users.find(
+    user =>
+      user.email === email &&
+      user.password === password
+  );
+}
+
+export function getCurrentUser() {
+  return JSON.parse(
+    localStorage.getItem("currentUser")
+  );
+}
+
+export function setCurrentUser(user) {
+  localStorage.setItem(
+    "currentUser",
+    JSON.stringify(user)
+  );
+}
+
+export function logoutUser() {
+  localStorage.removeItem("currentUser");
+}
