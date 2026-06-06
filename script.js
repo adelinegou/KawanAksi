@@ -3,13 +3,15 @@ import {
   fetchEventById,
   saveNewEvent,
   saveVolunteerSubmission,
-  getMySubmissions, 
-  getProfile,       
-  saveProfile       
+  getMySubmissions,
+  getProfile,
+  saveProfile,
+  getCurrentUser,
+  setCurrentUser,
+  updateUser
 } from "./db.js";
 
-const currentUser =
-  JSON.parse(localStorage.getItem("currentUser"));
+const currentUser = getCurrentUser();
 
 const currentPage =
   window.location.pathname.split("/").pop();
@@ -28,7 +30,10 @@ const userInfo =
 if (userInfo && currentUser) {
 
   userInfo.innerHTML = `
-    <span>${currentUser.name} (${currentUser.role})</span>
+    <span>
+      <strong>Halo, ${currentUser.name}!</strong>
+      <span class="user-role">${currentUser.role}</span>
+    </span>
     <button id="logoutBtn">Logout</button>
   `;
 
@@ -393,9 +398,9 @@ if (profileForm) {
 
   // Load existing profile kalau udah pernah disimpen
   const profile = getProfile();
-  profName.value = profile.name || "";
-  profEmail.value = profile.email || "";
-  profPhone.value = profile.phone || "";
+  profName.value = currentUser?.name || profile.name || "";
+  profEmail.value = currentUser?.email || profile.email || "";
+  profPhone.value = currentUser?.phone || profile.phone || "";
 
   profileForm.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -410,11 +415,23 @@ if (profileForm) {
       return;
     }
 
-    saveProfile({
+    const updatedProfile = {
       name: profName.value.trim(),
       email: profEmail.value.trim(),
       phone: normalizePhone(profPhone.value)
-    });
+    };
+
+    saveProfile(updatedProfile);
+
+    if (currentUser) {
+      const updatedCurrentUser = {
+        ...currentUser,
+        ...updatedProfile
+      };
+
+      setCurrentUser(updatedCurrentUser);
+      updateUser(currentUser.id, updatedProfile);
+    }
 
     setStatus("profileStatus", "Profil berhasil disimpan!", "success");
   });

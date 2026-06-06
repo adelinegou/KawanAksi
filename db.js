@@ -38,11 +38,30 @@ export function getMySubmissions() {
 }
 
 export function getProfile() {
-  return JSON.parse(localStorage.getItem("kawanaksi_profile")) || { name: "", email: "", phone: "" };
+  const currentUser = getCurrentUser();
+  if (currentUser) {
+    return {
+      name: currentUser.name || "",
+      email: currentUser.email || "",
+      phone: currentUser.phone || "",
+    };
+  }
+
+  return {
+    name: "",
+    email: "",
+    phone: "",
+  };
 }
 
 export function saveProfile(data) {
-  localStorage.setItem("kawanaksi_profile", JSON.stringify(data));
+  const currentUser = getCurrentUser();
+  if (!currentUser) return;
+
+  const updatedUser = updateUser(currentUser.id, data);
+  if (updatedUser) {
+    setCurrentUser(updatedUser);
+  }
 }
 
 export function getUsers() {
@@ -85,6 +104,27 @@ export function setCurrentUser(user) {
     "currentUser",
     JSON.stringify(user)
   );
+}
+
+export function updateUser(id, updates) {
+  const users = getUsers();
+  const index = users.findIndex(
+    (user) => user.id === id
+  );
+
+  if (index === -1) return null;
+
+  users[index] = {
+    ...users[index],
+    ...updates,
+  };
+
+  localStorage.setItem(
+    "kawanaksi_users",
+    JSON.stringify(users)
+  );
+
+  return users[index];
 }
 
 export function logoutUser() {
